@@ -13,17 +13,7 @@ namespace Hero_Simple_Application4
 {
     public class Program
     {
-        static AnalogInput analogInput0 = new AnalogInput(CTRE.HERO.IO.Port1.Analog_Pin3);
-        static AnalogInput analogInput1 = new AnalogInput(CTRE.HERO.IO.Port1.Analog_Pin4);
-        static AnalogInput analogInput2 = new AnalogInput(CTRE.HERO.IO.Port1.Analog_Pin5);
-
-        /*
-        static TalonSRX rightSlave = new TalonSRX(4);
-        static TalonSRX right = new TalonSRX(3);
-        static TalonSRX leftSlave = new TalonSRX(2);
-        static TalonSRX left = new TalonSRX(1);
-        */
-
+       
         static StringBuilder stringBuilder = new StringBuilder();
 
         /* create a gamepad object */
@@ -32,6 +22,24 @@ namespace Hero_Simple_Application4
 
         public static void Main()
         {
+                       const int zmove = 0; //Forwards Backwards
+            const int xmove = 1; //Left Right
+            const int zxmove = 2; // All directions
+            const int stoppls = 4;
+            int mode = zmove;
+
+            const int mechTalonid1 = 668;
+            const int mechTalonid2 = 25;
+
+            //const int meterTime = 100000000;
+
+            CTRE.Phoenix.MotorControl.CAN.TalonSRX myTalon = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(0);
+            CTRE.Phoenix.MotorControl.CAN.TalonSRX myTalon2 = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(25);
+
+//            CTRE.Phoenix.MotorControl.CAN.TalonSRX myTalon3 = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(mechTalonid1);
+  //          CTRE.Phoenix.MotorControl.CAN.TalonSRX myTalon4 = new CTRE.Phoenix.MotorControl.CAN.TalonSRX(mechTalonid2);
+
+
             /*
             double read0;
             double read1;
@@ -41,9 +49,39 @@ namespace Hero_Simple_Application4
             /* create a gamepad object */
             CTRE.Phoenix.Controller.GameController myGamepad = new CTRE.Phoenix.Controller.GameController(new CTRE.Phoenix.UsbHostDevice(0));
 
-            /* simple counter to print and watch using the debugger */
-            int counter = 0;
+            CTRE.Phoenix.Controller.GameControllerValues gv = new CTRE.Phoenix.Controller.GameControllerValues();
+
             /* loop forever */
+            //AUTON!!!!
+            var startTime = DateTime.UtcNow;
+
+            while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(20500000))
+            {
+                myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, -1);
+                Debug.Print("Test: ");
+                /* allow motor control */
+                CTRE.Phoenix.Watchdog.Feed();
+            }
+
+            startTime = DateTime.UtcNow;
+
+            while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(1000000))
+            {
+                myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                CTRE.Phoenix.Watchdog.Feed();
+            }
+            
+            startTime = DateTime.UtcNow;
+
+            while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(1000000))
+            {
+                myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, -.5);
+                myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+            }
+
+
             while (true)
             {
                 /*
@@ -51,84 +89,121 @@ namespace Hero_Simple_Application4
                 read1 = analogInput1.Read();
                 read2 = analogInput2.Read();
                 */
+                //Debug.Print("bruh");
+                myGamepad.GetAllValues(ref gv);
 
-                if (myGamepad.GetConnectionStatus() == CTRE.Phoenix.UsbDeviceConnection.Connected)
-                {
-                    /* print the axis values */
-                    Debug.Print("axis0 - LSH:" + myGamepad.GetAxis(0)); //Left Stick Horizontal
-                    Debug.Print("axis1 - LSV:" + myGamepad.GetAxis(1)); //Left Stick Vertical
-                    Debug.Print("axis2 - RSH:" + myGamepad.GetAxis(2)); //Right Stick Horizontal
-                    Debug.Print("axis3 - RSV:" + myGamepad.GetAxis(5)); //Right Stick Vertical
-                    /* allow motor control */+
-                    CTRE.Phoenix.Watchdog.Feed();
+                if (myGamepad.GetButton(1) == true) {
+                    mode = zmove; //forwardsbackwards
+                } else if(myGamepad.GetButton(2) == true) {
+                    mode = xmove; //leftright
+                } else if(myGamepad.GetButton(3) == true) {
+                    mode = zxmove;
+                } else if (myGamepad.GetButton(4) == true) {
+                    mode = stoppls;
+                }
+
+                float speed = myGamepad.GetAxis(1) * -1;
+                float turn = myGamepad.GetAxis(0) * 1;
+
+                float shoulder = myGamepad.GetAxis(2);
+                float elbow = myGamepad.GetAxis(5);
+
+                    if (myGamepad.GetConnectionStatus() == CTRE.Phoenix.UsbDeviceConnection.Connected)
+                    {
+                        /* print the axis values */
+                        
+                        Debug.Print("axis0 - LSH:" + myGamepad.GetAxis(0)); //Left Stick Horizontal // For movement of the wheels
+                        Debug.Print("axis1 - LSV:" + myGamepad.GetAxis(1)); //Left Stick Vertical  //For movement of the wheels
+                        Debug.Print("axis2 - RSH:" + myGamepad.GetAxis(2)); //Right Stick Horizontal //For movement of the Arm
+                        Debug.Print("axis3 - RSV:" + myGamepad.GetAxis(5)); //Right Stick Vertical //For movement of the Arm
+                        if (mode == zmove) {
+                            Debug.Print("Forward/Reverse Mode");
+                        } else if(mode == xmove) {
+                            Debug.Print("Turning Mode");
+                        } else if(mode == zxmove) {
+                            Debug.Print("Forward/Reverse + Turning Mode");
+                        } else if(mode == stoppls)
+                        {
+                            Debug.Print("STOP!!!");
+                        }
+
+                    /* allow motor control */
+                    if (gv.pov == 1)
+                    {
+                        Debug.Print("reset");
+                    }
+                        
+
+                    if (gv.pov == 2)
+                        {
+                            Debug.Print("p2");
+                        }
+                        else if (gv.pov == 3) 
+                        {
+                            Debug.Print("p3");
+                        }
+                        else if (gv.pov == 4)
+                        {
+                            Debug.Print("p4");
+                        }
+                        else if (gv.pov == 5) 
+                        {
+                            Debug.Print("p5");
+                        }
+                        else if (gv.pov == 6)
+                        {
+                            Debug.Print("p6");
+                        }
+                        else if (gv.pov == 7)
+                        {
+                            Debug.Print("p7");
+                        } else if (gv.pov == 8)
+                        {
+                           Debug.Print("p8");
+                        } else
+                        {
+                        }
+                        
+                        if (mode == zmove)
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, speed * 1);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, speed * -1);
+                            
+                         //   myTalon3.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, shoulder);
+                           // myTalon4.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, elbow);
+                        }
+                        else if (mode == xmove)
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, turn * 1);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, turn * 1);
+
+                            //myTalon3.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, shoulder);
+                            //myTalon4.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, elbow);
+                        }
+                        else if (mode == zxmove)
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * 1) / 2 + turn / 2);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * -1) / 2 + turn / 2);
+
+                            //myTalon3.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, shoulder);
+                            //myTalon4.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, elbow);
+                        } else if (mode == stoppls) {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+
+                            //myTalon3.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            //myTalon4.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+
+                        }
                 }
 
 
-                /* Move Robot */
-                Drive();
-                /* print whatever is in our string builder */
-                //Debug.Print(stringBuilder.ToString());
-                //stringBuilder.Clear();
-                /* feed watchdog to keep Talon's enabled */
-                CTRE.Phoenix.Watchdog.Feed();
-                /* run this task every 20ms */
-                Thread.Sleep(20);
-                /* print the three analog inputs as three columns */
-                //Debug.Print("Counter Value: " + counter);
-                //Debug.Print("" + read0 + "\t" + read1 + "\t" + read2);
+                Thread.Sleep(10);
 
+                    CTRE.Phoenix.Watchdog.Feed();
+                }
 
-                /* increment counter */
-                ++counter; /* try to land a breakpoint here and hover over 'counter' to see it's current value.  Or add it to the Watch Tab */
-
-                /* wait a bit */
-                System.Threading.Thread.Sleep(100);
-            }
-        }
-        static void Deadband(ref float value)
-        {
-            if (value < -0.10)
-            {
-                /* outside of deadband */
-            }
-            else if (value > +0.10)
-            {
-                /* outside of deadband */
-            }
-            else
-            {
-                /* within 10% so zero it */
-                value = 0;
-            }
-        }
-        static void Drive()
-        {
-           /* (null == _gamepad)
-                _gamepad = new GameController(UsbHostDevice.GetInstance());
-
-            float x = _gamepad.GetAxis(0);
-            float y = -1 * _gamepad.GetAxis(1);
-            float twist = _gamepad.GetAxis(2);
-
-            Deadband(ref x);
-            Deadband(ref y);
-            Deadband(ref twist);
-
-            float leftThrot = y + twist;
-            float rightThrot = y - twist;
-
-            left.Set(ControlMode.PercentOutput, leftThrot);
-            leftSlave.Set(ControlMode.PercentOutput, leftThrot);
-            right.Set(ControlMode.PercentOutput, -rightThrot);
-            rightSlave.Set(ControlMode.PercentOutput, -rightThrot);
-
-            stringBuilder.Append("\t");
-            stringBuilder.Append(x);
-            stringBuilder.Append("\t");
-            stringBuilder.Append(y);
-            stringBuilder.Append("\t");
-            stringBuilder.Append(twist);
-            */
+            
         }
     }
 }
