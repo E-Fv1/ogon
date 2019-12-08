@@ -60,7 +60,9 @@ namespace Hero_Simple_Application4
 
             if (auton == 1)
             {
-                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(20500000 * 95 / 100))
+                startTime = DateTime.Now;
+
+                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(20500000 * 77 / 100))
                 {
                     myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, -1);
                     myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
@@ -80,7 +82,7 @@ namespace Hero_Simple_Application4
 
                 startTime = DateTime.UtcNow;
 
-                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(10000000))
+                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(7000000))
                 {
                     myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
                     myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
@@ -100,7 +102,7 @@ namespace Hero_Simple_Application4
 
                 startTime = DateTime.UtcNow;
 
-                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(100000))
+                while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(1000000))
                 {
                     myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
                     myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
@@ -166,7 +168,65 @@ namespace Hero_Simple_Application4
                     /* allow motor control */
                     if (gv.pov == 1)
                     {
-                        Debug.Print("reset");
+                        startTime = DateTime.Now;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(20500000 * 77 / 100))
+                        {
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, -1);
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            Debug.Print("Test: ");
+                            /* allow motor control */
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
+
+                        startTime = DateTime.UtcNow;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(10000))
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
+
+                        startTime = DateTime.UtcNow;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(7000000))
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            Debug.Print("turn");
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
+
+                        startTime = DateTime.UtcNow;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(28000000))
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, -1);
+                            Debug.Print("fwrd");
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
+
+                        startTime = DateTime.UtcNow;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(1000000))
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 1);
+                            Debug.Print("turn2");
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
+
+                        startTime = DateTime.UtcNow;
+
+                        while (DateTime.UtcNow - startTime < TimeSpan.FromTicks(1000000))
+                        {
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, 0);
+                            Debug.Print("stopping");
+                            CTRE.Phoenix.Watchdog.Feed();
+                        }
                     }
                         
 
