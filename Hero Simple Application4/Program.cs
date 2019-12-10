@@ -278,8 +278,8 @@ namespace Hero_Simple_Application4
                         }
                         else if (mode == zxmove)
                         {
-                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * 1) / 2 + turn / 2);
-                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * -1) / 2 + turn / 2);
+                            myTalon.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * 1) + turn);
+                            myTalon2.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, (speed * -1)  + turn);
 
                             //myTalon3.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, shoulder);
                             //myTalon4.Set(CTRE.Phoenix.MotorControl.ControlMode.PercentOutput, elbow);
